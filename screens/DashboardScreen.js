@@ -74,7 +74,10 @@ export default function DashboardScreen({ navigation }) {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cardSecondary} onPress={() => {}}>
+        <TouchableOpacity
+          style={styles.cardSecondary}
+          onPress={() => navigation.navigate("JobsList")}
+        >
           <Text style={styles.cardTitleSecondary}>Vagas</Text>
           <Text style={styles.cardTextSecondary}>
             Cadastre vagas e defina as skills para o cálculo de compatibilidade.

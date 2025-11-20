@@ -10,8 +10,7 @@ import {
   ScrollView,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
-// quando tiver o backend pronto, podemos importar algo como:
-// import { parseResume } from "../services/resumeService";
+import { parseResume } from "../services/resumeService"; // ⬅️ integração com FastAPI
 
 export default function ResumeUploadScreen() {
   const [file, setFile] = useState(null);
@@ -36,46 +35,32 @@ export default function ResumeUploadScreen() {
     }
   }
 
-  async function handleUpload() {
-    if (!file) {
-      Alert.alert("Atenção", "Selecione um arquivo PDF primeiro.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      // 🔹 Aqui depois você chama sua API real de IA:
-      // const data = await parseResume(file);
-      // setResult(data);
-
-      // Por enquanto, mock para ver a tela funcionando:
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      setResult({
-        name: "Ana Souza",
-        email: "ana@exemplo.com",
-        phone: "+55 11 99999-0000",
-        skills: ["React", "TypeScript", "SQL"],
-        experienceYears: 3,
-        score: {
-          match: 0.86,
-          similarity: 0.82,
-          coverage: 0.67,
-          overlap_skills: ["React", "TypeScript"],
-          missing_skills: ["Testing"],
-        },
-      });
-    } catch (err) {
-      console.log(err);
-      Alert.alert(
-        "Erro",
-        "Ocorreu um problema ao enviar o currículo para análise."
-      );
-    } finally {
-      setLoading(false);
-    }
+async function handleUpload() {
+  if (!file) {
+    Alert.alert("Atenção", "Selecione um arquivo PDF primeiro.");
+    return;
   }
 
+  try {
+    setLoading(true);
+
+    const jobSkills = ["React", "TypeScript", "SQL"];
+    const jobText =
+      "Desenvolvimento front-end em React e TypeScript, integração com APIs e bancos de dados.";
+
+    const data = await parseResume(file, jobSkills, jobText);
+    setResult(data);
+  } catch (err) {
+  console.log("ERRO AO ENVIAR CURRÍCULO:", err?.response?.data || err.message);
+  Alert.alert(
+    "Erro",
+    "Ocorreu um problema ao enviar o currículo para análise."
+  );
+} finally {
+  setLoading(false);
+}
+
+}
   return (
     <ScrollView
       style={styles.container}
@@ -110,7 +95,7 @@ export default function ResumeUploadScreen() {
         <Text style={styles.cardTitle}>2. Enviar para análise</Text>
         <Text style={styles.cardText}>
           A IA irá extrair nome, contato, skills e calcular o match com as vagas
-          cadastradas (quando integrar com o backend).
+          cadastradas.
         </Text>
 
         <TouchableOpacity
@@ -132,17 +117,22 @@ export default function ResumeUploadScreen() {
 
           <View style={styles.resultRow}>
             <Text style={styles.resultLabel}>Nome:</Text>
-            <Text style={styles.resultValue}>{result.name}</Text>
+            <Text style={styles.resultValue}>{result.name || "-"}</Text>
           </View>
 
           <View style={styles.resultRow}>
             <Text style={styles.resultLabel}>Email:</Text>
-            <Text style={styles.resultValue}>{result.email}</Text>
+            <Text style={styles.resultValue}>{result.email || "-"}</Text>
           </View>
 
           <View style={styles.resultRow}>
             <Text style={styles.resultLabel}>Telefone:</Text>
-            <Text style={styles.resultValue}>{result.phone}</Text>
+            <Text style={styles.resultValue}>{result.phone || "-"}</Text>
+          </View>
+
+          <View style={styles.resultRow}>
+            <Text style={styles.resultLabel}>LinkedIn:</Text>
+            <Text style={styles.resultValue}>{result.linkedin || "-"}</Text>
           </View>
 
           <View style={styles.resultRow}>
@@ -172,7 +162,8 @@ export default function ResumeUploadScreen() {
                 {result.score.coverage.toFixed(2)}
               </Text>
               <Text style={styles.resultScoreDetail}>
-                Skills em comum: {result.score.overlap_skills.join(", ") || "-"}
+                Skills em comum:{" "}
+                {result.score.overlap_skills.join(", ") || "-"}
               </Text>
               <Text style={styles.resultScoreDetail}>
                 Skills faltantes:{" "}

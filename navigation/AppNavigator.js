@@ -3,6 +3,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import LoginScreen from "../screens/LoginScreen";
+import JobsListScreen from "../screens/JobsListScreen";
 import SignupScreen from "../screens/SignupScreen";
 import DashboardScreen from "../screens/DashboardScreen";
 import ResumeUploadScreen from "../screens/ResumeUploadScreen";
@@ -20,6 +21,12 @@ export default function AppNavigator({ isLoggedIn }) {
             name="Dashboard"
             component={DashboardScreen}
             options={{ title: "TalentVision" }}
+          />
+
+          <Stack.Screen
+            name="JobsList"
+            component={JobsListScreen}
+            options={{ title: "Vagas" }}
           />
 
           <Stack.Screen
