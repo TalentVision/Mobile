@@ -8,37 +8,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from "react-native";
+
+import { fetchCandidates } from "../services/candidateService"; // ⬅️ agora usando backend real
 
 const BLUE = "#2D6CDF";
 const BG = "#F2F6FC";
-
-const MOCK_CANDIDATES = [
-  {
-    id: "1",
-    name: "Ana Souza",
-    email: "ana@exemplo.com",
-    role: "Desenvolvedora Front-end",
-    skills: ["React", "TypeScript", "Testing"],
-    match: 0.86,
-  },
-  {
-    id: "2",
-    name: "Bruno Lima",
-    email: "bruno@exemplo.com",
-    role: "Engenheiro Back-end",
-    skills: [".NET", "SQL", "Azure"],
-    match: 0.79,
-  },
-  {
-    id: "3",
-    name: "Carla Santos",
-    email: "carla@exemplo.com",
-    role: "Full Stack",
-    skills: ["React", "Node.js", "PostgreSQL"],
-    match: 0.82,
-  },
-];
 
 export default function CandidatesListScreen({ navigation }) {
   const [candidates, setCandidates] = useState([]);
@@ -48,10 +24,11 @@ export default function CandidatesListScreen({ navigation }) {
   async function loadCandidates() {
     try {
       setLoading(true);
-      await new Promise((r) => setTimeout(r, 800)); // simula delay
-      setCandidates(MOCK_CANDIDATES);
+      const data = await fetchCandidates();
+      setCandidates(data);
     } catch (err) {
       console.log("Erro ao carregar candidatos:", err);
+      Alert.alert("Erro", "Não foi possível carregar os candidatos.");
     } finally {
       setLoading(false);
     }
@@ -68,31 +45,43 @@ export default function CandidatesListScreen({ navigation }) {
   }
 
   function renderItem({ item }) {
-    const matchPct = Math.round((item.match || 0) * 100);
+    const matchPct = item.match
+      ? Math.round(item.match * 100)
+      : null;
 
     return (
       <TouchableOpacity
         style={styles.card}
         activeOpacity={0.9}
-        onPress={() => navigation.navigate("CandidateDetails", { candidate: item })}
+        onPress={() =>
+          navigation.navigate("CandidateDetails", {
+            candidateId: item.id, // agora enviamos apenas o ID
+          })
+        }
       >
         <View style={styles.cardHeader}>
-          <Text style={styles.cardName}>{item.name}</Text>
-          <View style={styles.matchBadge}>
-            <Text style={styles.matchBadgeText}>{matchPct}% match</Text>
+          <Text style={styles.cardName}>{item.name || "Nome não identificado"}</Text>
+
+          {matchPct !== null && (
+            <View style={styles.matchBadge}>
+              <Text style={styles.matchBadgeText}>{matchPct}% match</Text>
+            </View>
+          )}
+        </View>
+
+        <Text style={styles.cardEmail}>{item.email || "-"}</Text>
+
+        {item.skills && item.skills.length > 0 && (
+          <View style={styles.skillsRow}>
+            <Text style={styles.skillLabel}>Skills:</Text>
+            <Text style={styles.skillText}>{item.skills.join(", ")}</Text>
           </View>
-        </View>
-
-        <Text style={styles.cardRole}>{item.role}</Text>
-        <Text style={styles.cardEmail}>{item.email}</Text>
-
-        <View style={styles.skillsRow}>
-          <Text style={styles.skillLabel}>Skills:</Text>
-          <Text style={styles.skillText}>{item.skills.join(", ")}</Text>
-        </View>
+        )}
 
         <View style={styles.cardFooter}>
-          <Text style={styles.detailsButtonText}>Toque para ver detalhes →</Text>
+          <Text style={styles.detailsButtonText}>
+            Toque para ver detalhes →
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -102,7 +91,7 @@ export default function CandidatesListScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Candidatos</Text>
       <Text style={styles.subtitle}>
-        Aqui você vê os candidatos que já foram analisados pela TalentVision.
+        Aqui aparecem todos os candidatos analisados pela IA da TalentVision.
       </Text>
 
       {loading ? (
@@ -114,14 +103,13 @@ export default function CandidatesListScreen({ navigation }) {
         <View style={styles.emptyBox}>
           <Text style={styles.emptyTitle}>Nenhum candidato ainda</Text>
           <Text style={styles.emptyText}>
-            Faça o upload de currículos na tela de Upload para que eles
-            apareçam aqui após a análise.
+            Faça upload de currículos na tela de Upload para que eles apareçam aqui.
           </Text>
         </View>
       ) : (
         <FlatList
           data={candidates}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item.id)}
           renderItem={renderItem}
           contentContainerStyle={{ paddingVertical: 8 }}
           refreshControl={
@@ -210,11 +198,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
   },
-  cardRole: {
-    fontSize: 13,
-    color: "#4B5563",
-    marginBottom: 2,
-  },
   cardEmail: {
     fontSize: 12,
     color: "#6B7280",
@@ -236,7 +219,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   cardFooter: {
-    marginTop: 4,
+    marginTop: 6,
   },
   detailsButtonText: {
     fontSize: 12,
