@@ -1,3 +1,4 @@
+// navigation/AppNavigator.js
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -5,6 +6,8 @@ import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 import DashboardScreen from "../screens/DashboardScreen";
 import ResumeUploadScreen from "../screens/ResumeUploadScreen";
+import CandidatesListScreen from "../screens/CandidatesListScreen";
+import CandidateDetailsScreen from "../screens/CandidateDetailsScreen"; // ⬅ IMPORT
 
 const Stack = createNativeStackNavigator();
 
@@ -13,8 +16,29 @@ export default function AppNavigator({ isLoggedIn }) {
     <Stack.Navigator>
       {isLoggedIn ? (
         <>
-          <Stack.Screen name="Dashboard" component={DashboardScreen} />
-          <Stack.Screen name="ResumeUpload" component={ResumeUploadScreen} />
+          <Stack.Screen
+            name="Dashboard"
+            component={DashboardScreen}
+            options={{ title: "TalentVision" }}
+          />
+
+          <Stack.Screen
+            name="ResumeUpload"
+            component={ResumeUploadScreen}
+            options={{ title: "Upload de Currículo" }}
+          />
+
+          <Stack.Screen
+            name="CandidatesList"
+            component={CandidatesListScreen}
+            options={{ title: "Candidatos" }}
+          />
+
+          <Stack.Screen
+            name="CandidateDetails"
+            component={CandidateDetailsScreen}
+            options={{ title: "Detalhes do Candidato" }}
+          />
         </>
       ) : (
         <>
@@ -23,7 +47,11 @@ export default function AppNavigator({ isLoggedIn }) {
             component={LoginScreen}
             options={{ headerShown: false }}
           />
-          <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen
+            name="Signup"
+            component={SignupScreen}
+            options={{ title: "Criar conta" }}
+          />
         </>
       )}
     </Stack.Navigator>

@@ -43,11 +43,11 @@ export default function DashboardScreen({ navigation }) {
       {/* Saudação */}
       <View style={styles.greetingBox}>
         <Text style={styles.greetingTitle}>
-          Olá{firstName ? `, ${firstName}` : ""} 👋
+          Olá{firstName ? `, ${firstName}` : ""}
         </Text>
         <Text style={styles.greetingText}>
-          Bem-vindo(a) ao painel da TalentVision. Aqui você acompanha candidatos,
-          vagas e faz upload de currículos para análise com IA.
+          Bem-vindo(a) ao painel da TalentVision. Aqui você acompanha
+          candidatos, vagas e faz upload de currículos para análise com IA.
         </Text>
       </View>
 
@@ -66,8 +66,7 @@ export default function DashboardScreen({ navigation }) {
 
         <TouchableOpacity
           style={styles.cardSecondary}
-          // quando criar as telas, troque os onPress:
-          onPress={() => {}}
+          onPress={() => navigation.navigate("CandidatesList")}
         >
           <Text style={styles.cardTitleSecondary}>Candidatos</Text>
           <Text style={styles.cardTextSecondary}>
@@ -75,10 +74,7 @@ export default function DashboardScreen({ navigation }) {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.cardSecondary}
-          onPress={() => {}}
-        >
+        <TouchableOpacity style={styles.cardSecondary} onPress={() => {}}>
           <Text style={styles.cardTitleSecondary}>Vagas</Text>
           <Text style={styles.cardTextSecondary}>
             Cadastre vagas e defina as skills para o cálculo de compatibilidade.
