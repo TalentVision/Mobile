@@ -71,8 +71,8 @@ O app faz parte do projeto da **Global Solution – IOT**, integrando visão de 
 ### 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/talentvision-mobile.git
-cd talentvision-mobile
+git clone https://github.com/TalentVision/Mobile.git
+cd Mobile
 ```
 
 ### 2. Instalar dependências
